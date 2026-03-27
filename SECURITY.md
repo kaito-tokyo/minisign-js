@@ -10,7 +10,7 @@ While we make best efforts to address vulnerabilities, this project is provided 
 
 ## Reporting a Vulnerability
 
-If you find any security vulnerabilities, please report them to us privately. Do not disclose vulnerabilities to any third party. We are responsible to resolve issues of our products.
+If you find any security vulnerabilities, please report them to us privately. Do not disclose vulnerabilities to any third party. We are responsible for resolving issues with our products.
 
 - [GitHub Security Advisories](https://github.com/kaito-tokyo/minisign-js/security/advisories)
 - [Security Team of Kaito.tokyo](mailto:umireon@kaito.tokyo)
