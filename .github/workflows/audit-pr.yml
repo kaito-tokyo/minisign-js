@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: 2026 Kaito Udagawa <umireon@kaito.tokyo>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Audit PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        required: true
+        type: string
+
+jobs:
+  add-audit-to-pr:
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+
+    permissions:
+      contents: write
+      pull-requests: read
+
+    env:
+      BRANCH: audit/pr-stamp
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ env.BRANCH }}
+          persist-credentials: true
+          fetch-depth: 0
+
+      - shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        env:
+          AUDIT_FILENAME: "audit-pr-$PR_NUMBER-runid-$GITHUB_RUN_ID.txt"
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr-number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          gh pr view "$PR_NUMBER" > "$AUDIT_FILENAME"
+          git add "$AUDIT_FILENAME"
+          git commit -S -m "audit-pr: $AUDIT_FILENAME"
+          git push origin "HEAD:$BRANCH"
+
+
+
+

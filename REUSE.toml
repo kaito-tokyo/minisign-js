@@ -2,13 +2,16 @@ version = 1
 
 [[annotations]]
 path = [
-  "package.json",
-  "package-lock.json",
-  "@kaito-tokyo/*/package.json",
-  "@kaito-tokyo/*/package-lock.json",
+  ".gitattributes",
+  ".github/aw/actions-lock.json",
+  ".github/workflows/*.lock.yml",
   ".node-version",
-  "tsconfig.base.json",
+  "@kaito-tokyo/*/package-lock.json",
+  "@kaito-tokyo/*/package.json",
   "@kaito-tokyo/*/tsconfig.json",
+  "package-lock.json",
+  "package.json",
+  "tsconfig.base.json",
 ]
 SPDX-FileCopyrightText = "2026 Kaito Udagawa <umireon@kaito.tokyo>"
 SPDX-License-Identifier = "CC0-1.0"
