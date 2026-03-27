@@ -1,0 +1,46 @@
+{
+  "name": "@kaito-tokyo/minisign-verify",
+  "version": "1.0.0",
+  "description": "Self-contained Minisign signature verification library for ES Modules",
+  "keywords": [],
+  "homepage": "https://github.com/kaito-tokyo/minisign-js",
+  "bugs": {
+    "url": "https://github.com/kaito-tokyo/minisign-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kaito-tokyo/minisign-js.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Kaito Udagawa <umireon@kaito.tokyo> (https://github.com/umireon)",
+  "type": "module",
+  "main": "./index.mjs",
+  "types": "./index.d.mts",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "types": "./index.d.mts"
+    }
+  },
+  "files": [
+    "index.mjs",
+    "index.d.mts",
+    "index.d.mts.license"
+  ],
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "node --test",
+    "types": "tsc index.mjs --declaration --allowJs --emitDeclarationOnly --ignoreConfig"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "typescript": "^6.0.2"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
