@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2026 Kaito Udagawa <umireon@kaito.tokyo>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Test CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ["*"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        package: ["@kaito-tokyo/minisign-verify"]
+
+    runs-on: ubuntu-slim
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version-file: .node-version
+
+      - name: Install dependencies from npm
+        shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        working-directory: ${{ matrix.package }}
+        run: npm ci
+
+      - name: Run tests
+        shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        working-directory: ${{ matrix.package }}
+        run: npm test
