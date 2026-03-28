@@ -32,7 +32,7 @@ jobs:
 
       - shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
         env:
-          AUDIT_FILENAME: "audit-pr-$PR_NUMBER-runid-$GITHUB_RUN_ID.txt"
+          AUDIT_FILENAME: "audit-pr-${{ inputs.pr-number }}-runid-${{ github.run_id }}.txt"
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ inputs.pr-number }}
         run: |

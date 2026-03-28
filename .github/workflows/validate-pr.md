@@ -40,8 +40,6 @@ steps:
     env:
       GH_TOKEN: ${{ github.token }}
     run: |
-      mkdir -p /tmp/gh-aw/agent
-
       VALID_ITEMS=(
         'I have read the latest CONTRIBUTING.md.'
         'I have signed off and verified all my commits.'
@@ -49,13 +47,13 @@ steps:
 
       GH_PR_VIEW_ARGS=(
         --json body
-        --jq '[.body | splits("\r?\n") | match("^- \\[[ xX]\\] (.*)$")]'
+        --jq '[.body | splits("\r?\n") | try match("^- \\[[ xX]\\] (.*)$") catch empty]'
       )
 
       gh pr view "${GH_PR_VIEW_ARGS[@]}" > /tmp/raw_pr_checklist.json
 
       {
-        echo '## Pull Request Checklist (Listing all the valid items, incluing not found errors)'
+        echo '## Pull Request Checklist (Listing all the valid items, including not found errors)'
         echo
         for item in "${VALID_ITEMS[@]}"; do
           if ! jq -e -r --arg item "$item" '.[] | select(.captures[0].string == $item) | .string' /tmp/raw_pr_checklist.json; then
@@ -65,6 +63,8 @@ steps:
       } >/tmp/gh-aw/agent/pr_checklist.md
 
 safe-outputs:
+  report-failure-as-issue: false
+
   messages:
     append-only-comments: true
 
@@ -148,12 +148,12 @@ This workflow is triggered by label command on Pull Request.
 ## Checks
 
 - **Commit Signing**
-  - **Input**: Read `/tmp/gh-aw/agent/pr_commits.json` for summerized commit objects.
+  - **Input**: Read `/tmp/gh-aw/agent/pr_commits.json` for summarized commit objects.
   - **Verification**: Inspect the `verification` object of every commit on this Pull Request, and verify if all commits on this Pull Request are properly signed.
   - **Context**: Refer to `CONTRIBUTING.md` for this commit signing policy.
 
 - **DCO (Developer’s Certificate of Origin)**
-  - **Input**: Read `/tmp/gh-aw/agent/pr_commits.json` for summerized commit objects.
+  - **Input**: Read `/tmp/gh-aw/agent/pr_commits.json` for summarized commit objects.
   - **Verification**: Inspect the `message` field of every commit on this Pull Request, and verify if all commits on this Pull Request contain a valid `Signed-off-by:` trailer for DCO compliance.
   - **Context**: Refer to `CONTRIBUTING.md` for this policy.
 
@@ -165,6 +165,6 @@ This workflow is triggered by label command on Pull Request.
 
 - **Pull Request Comment**: A human-friendly summary MUST be posted on Pull Request.
   - **Output Format**: Add a single Pull Request comment for the check result.
-  - **Summary Line**: The first line of your comment MUST be a single-line summary of this validation, starting with either ✅ or 🚫. Call validate-pr-result with the boolean result of this check.
+  - **Summary Line**: The first line of your comment MUST be a single-line summary of this validation, starting with either ✅ or 🚫. Call the accept-validate-pr tool with the boolean result of this check.
 - **Accept tool**: You MUST provide the check result with the accept tool to control merge admittance.
   - **Output Method**: Call the accept-validate-pr tool with the check results.
