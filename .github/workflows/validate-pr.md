@@ -123,9 +123,9 @@ safe-outputs:
             fi
 
             if [[ "$rejected" -eq 1 ]]; then
-              messages+=("ERROR: $GITHUB_JOB_ID rejected this check.")
+              messages+=("ERROR: $GITHUB_JOB rejected this check.")
             else
-              messages+=("$GITHUB_JOB_ID accepted the overall result.")
+              messages+=("$GITHUB_JOB accepted the overall result.")
             fi
 
             for m in "${messages[@]}"; do
