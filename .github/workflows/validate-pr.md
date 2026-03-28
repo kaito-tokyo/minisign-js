@@ -9,6 +9,7 @@ on:
   label_command:
     name: validate
     events: [pull_request]
+  status-comment: false
 
 metadata:
   author: Kaito Udagawa
@@ -65,6 +66,7 @@ steps:
       } >/tmp/gh-aw/agent/pr_checklist.md
 
 safe-outputs:
+  activation-comments: false
   report-failure-as-issue: false
 
   messages:
@@ -78,7 +80,7 @@ safe-outputs:
       description: Decide if the result of this workflow is acceptable.
 
       inputs:
-        commit-signing:
+        commit_signing:
           description: A boolean value to represent if commit signing check is passed or not.
           required: true
           type: boolean
@@ -86,7 +88,7 @@ safe-outputs:
           description: A boolean value to represent if DCO check is passed or not.
           required: true
           type: boolean
-        pull-request-checklist:
+        pull_request_checklist:
           description: A boolean value to represent if Pull Request Checklist check is passed or not.
           required: true
           type: boolean
@@ -97,27 +99,37 @@ safe-outputs:
 
       steps:
         - name: Accept or Reject
-          id: accept-reject
           shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
-          env:
-            COMMIT_SIGNING: ${{ inputs.commit-signing }}
-            DCO: ${{ inputs.dco }}
-            PULL_REQUEST_CHECKLIST: ${{ inputs.pull-request-checklist }}
           run: |
+            if ! [[ -f "$GH_AW_AGENT_OUTPUT" ]]; then
+              echo "No agent output found."
+              exit 1
+            fi
+
+            COUNT="$(jq '[.items[] | select(.type == "accept_validate_pr")] | length' "$GH_AW_AGENT_OUTPUT")"
+            if [[ "$COUNT" -ne 1 ]]; then
+              echo "ERROR: $COUNT inputs received, only one was expected."
+              exit 1
+            fi
+
+            COMMIT_SIGNING="$(jq -r '.items[] | select(.type == "accept_validate_pr") | .commit_signing' "$GH_AW_AGENT_OUTPUT")"
+            DCO="$(jq -r '.items[] | select(.type == "accept_validate_pr") | .dco' "$GH_AW_AGENT_OUTPUT")"
+            PULL_REQUEST_CHECKLIST="$(jq -r '.items[] | select(.type == "accept_validate_pr") | .pull_request_checklist' "$GH_AW_AGENT_OUTPUT")"
+
             rejected=0
             messages=()
 
-            if ! [[ "$COMMIT_SIGNING" = true ]]; then
+            if [[ "$COMMIT_SIGNING" != "true" ]]; then
               messages+=("Commit Signing check was rejected.")
               rejected=1
             fi
 
-            if ! [[ "$DCO" = true ]]; then
+            if [[ "$DCO" != "true" ]]; then
               messages+=("DCO check was rejected.")
               rejected=1
             fi
 
-            if ! [[ "$PULL_REQUEST_CHECKLIST" = true ]]; then
+            if [[ "$PULL_REQUEST_CHECKLIST" != "true" ]]; then
               messages+=("Pull Request Checklist check was rejected.")
               rejected=1
             fi
@@ -165,8 +177,15 @@ This workflow is triggered by label command on Pull Request.
 
 ## Outputs
 
-- **Pull Request Comment**: A human-friendly summary MUST be posted on Pull Request.
-  - **Output Format**: Add a single Pull Request comment for the check result.
-  - **Summary Line**: The first line of your comment MUST be a single-line summary of this validation, starting with either ✅ or 🚫. Call the `accept_validate_pr` tool with the boolean result of this check.
-- **Accept tool**: You MUST provide the check result with the accept tool to control merge admittance.
-  - **Output Method**: Call the `accept_validate_pr` tool with the check results.
+You MUST add a single pull request comment and use the accept tool once as described below.
+
+**Pull Request Comment**:
+
+- **Condition**: Always add a summary comment, regardless of the check result.
+- **Output Format**: You MUST add a summary comment that describes what you verify on the Pull Request.
+- **Summary Line**: The first line of your comment MUST be a single-line summary of this validation, starting with either ✅ or 🚫.
+
+**Accept tool**:
+
+- **Condition**: Always call the `accept_validate_pr` tool, regardless of the check result.
+- **Output Format**: You MUST send the check result to the `accept_validate_pr` tool to control merge admittance, providing the three boolean fields: `commit_signing`, `dco`, and `pull_request_checklist`.
