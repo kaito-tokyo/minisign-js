@@ -18,7 +18,7 @@ permissions:
   contents: read
   pull-requests: read
 
-if: startsWith(github.ref, 'refs/pull/')
+if: startsWith(github.ref, 'refs/pull/') && github.event.label.name == 'validate'
 
 steps:
   - name: Fetch Pull Request commits
@@ -45,12 +45,14 @@ steps:
         'I have signed off and verified all my commits.'
       )
 
+      PR_NUMBER="${GITHUB_REF_NAME%/merge}"
+
       GH_PR_VIEW_ARGS=(
         --json body
         --jq '[.body | splits("\r?\n") | try match("^- \\[[ xX]\\] (.*)$") catch empty]'
       )
 
-      gh pr view "${GH_PR_VIEW_ARGS[@]}" > /tmp/raw_pr_checklist.json
+      gh pr view "$PR_NUMBER" "${GH_PR_VIEW_ARGS[@]}" > /tmp/raw_pr_checklist.json
 
       {
         echo '## Pull Request Checklist (Listing all the valid items, including not found errors)'
