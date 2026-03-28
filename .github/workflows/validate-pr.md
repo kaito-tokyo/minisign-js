@@ -73,7 +73,7 @@ safe-outputs:
   add-comment:
 
   jobs:
-    accept-validate-pr:
+    accept_validate_pr:
       name: Accept validate-pr
       description: Decide if the result of this workflow is acceptable.
 
@@ -167,6 +167,6 @@ This workflow is triggered by label command on Pull Request.
 
 - **Pull Request Comment**: A human-friendly summary MUST be posted on Pull Request.
   - **Output Format**: Add a single Pull Request comment for the check result.
-  - **Summary Line**: The first line of your comment MUST be a single-line summary of this validation, starting with either ✅ or 🚫. Call the accept-validate-pr tool with the boolean result of this check.
+  - **Summary Line**: The first line of your comment MUST be a single-line summary of this validation, starting with either ✅ or 🚫. Call the `accept_validate_pr` tool with the boolean result of this check.
 - **Accept tool**: You MUST provide the check result with the accept tool to control merge admittance.
-  - **Output Method**: Call the accept-validate-pr tool with the check results.
+  - **Output Method**: Call the `accept_validate_pr` tool with the check results.
