@@ -36,13 +36,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ inputs.pr-number }}
         run: |
+          CONTENT_B64="$(gh pr view "$PR_NUMBER" | base64 -w 0)"
           GH_REPO_CONTENT_CREATE_ARGS=(
             --method PUT
             -H "Accept: application/vnd.github+json"
             -H "X-GitHub-Api-Version: 2026-03-10"
             "/repos/$GITHUB_REPOSITORY/contents/$AUDIT_FILENAME"
-            -f "message=$AUDIT_FILENAME"
-            -f "content=$(gh pr view "$PR_NUMBER" | base64 -w 0)"
+            -f "message=audit-pr: PR #$PR_NUMBER (run $GITHUB_RUN_ID)"
+            -f "content=$CONTENT_B64"
+            -f "branch=$BRANCH"
           )
           gh api "${GH_REPO_CONTENT_CREATE_ARGS[@]}"
 
