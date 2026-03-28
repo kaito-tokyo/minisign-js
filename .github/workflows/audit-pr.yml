@@ -36,12 +36,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ inputs.pr-number }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          gh pr view "$PR_NUMBER" > "$AUDIT_FILENAME"
-          git add "$AUDIT_FILENAME"
-          git commit -S -m "audit-pr: $AUDIT_FILENAME"
-          git push origin "HEAD:$BRANCH"
+          GH_REPO_CONTENT_CREATE_ARGS=(
+            --method PUT
+            -H "Accept: application/vnd.github+json"
+            -H "X-GitHub-Api-Version: 2026-03-10"
+            "/repos/$GITHUB_REPOSITORY/contents/$AUDIT_FILENAME"
+            -f "message=$AUDIT_FILENAME"
+            -f "content=$(gh pr view "$PR_NUMBER" | base64 -w 0)"
+          )
+          gh api "${GH_REPO_CONTENT_CREATE_ARGS[@]}"
+
 
 
 
