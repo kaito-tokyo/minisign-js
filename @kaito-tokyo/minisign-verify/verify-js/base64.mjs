@@ -4,8 +4,8 @@
 
 /**
  * @file @kaito-tokyo/minisign-verify/verify-js/base64.mjs
- * Self-contained Minisign signature verification library for ES Modules.
- * @version 0.1.1
+ * Base64 utilities for Modern JavaScript environments.
+ * @version 0.1.2
  * @since 2026-03-29
  */
 

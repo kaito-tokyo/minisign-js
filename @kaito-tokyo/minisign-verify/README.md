@@ -21,32 +21,21 @@ npm install @kaito-tokyo/minisign-verify
 **Node.js (24.x or later):**
 
 ```js
-import { createHash } from "node:crypto";
-import { createReadStream } from "node:fs";
-import { pipeline } from "node:stream/promises";
-import { readFile } from "node:fs/promises";
+import { MinisignVerifier } from "@kaito-tokyo/minisign-verify";
 
-import { parsePubkey, parseSigFile, verifyMinisign } from "@kaito-tokyo/minisign-verify";
+const verifier = await MinisignVerifier.create("PUBLICKEYBASE64");
+const verifyResult = await verifier.verifyFilepath("file.zip");
+if (!verifyResult.ok) {
+  throw new Error("Verification failed!");
+}
 
-const filePath = "file.zip";
+console.log("file.zip was verified!");
+```
 
-const pubkey = await parsePubkey("PUBKEY_STRING");
-const sigFile = await parseSigFile(await readFile(`${filePath}.minisig`, "utf8"));
-const dataFunc = async (blake2b512Required) => {
-  if (blake2b512Required) {
-    const hash = createHash("blake2b512");
-    await pipeline(createReadStream(filePath), hash);
-    return hash.digest();
-  } else {
-    return readFile(filePath);
-  }
-};
+**CLI**:
 
-const verifyResult = await verifyMinisign(pubkey, sigFile, dataFunc);
-
-if (!verifyResult.ok) throw new Error("Verification failed!");
-
-console.log(`${filePath} was verified!`)
+```sh
+npx @kaito-tokyo/minisign-verify -V -P "PUBLICKEYBASE64" -m "file.zip"
 ```
 
 ## Attribution

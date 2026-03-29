@@ -34,6 +34,7 @@
       "types": "./types/minisign.d.mts"
     }
   },
+  "bin": "./verify-js/minisign-verify-cli.mjs",
   "files": [
     "verify-js/*.mjs",
     "types/*.d.mts",

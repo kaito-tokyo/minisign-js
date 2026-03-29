@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * @file @kaito-tokyo/minisign-verify/verify-js/index.mjs
+ * @file @kaito-tokyo/minisign-verify/verify-js/minisign.mjs
  * Self-contained Minisign signature verification library for ES Modules.
- * @version 0.1.1
+ * @version 0.1.2
  * @since 2026-03-29
  */
 
@@ -29,11 +29,20 @@
  *
  * @typedef {bigint} KeynumKey The key type for a Pubkey Map based on keynum.
  *
- * @typedef {Object} VerifyMinisignResult
- * @property {boolean} ok Overall verification result.
+ * @typedef {Object} VerifyMinisignSuccessResult
+ * @property {true} ok Overall verification result.
+ * @property {string} trustedComment The verified trusted comment from the signature file.
  * @property {boolean} isPubkeyFound Whether the public key was found.
  * @property {boolean} isMessageValid The integrity of the data.
  * @property {boolean} isCommentValid The integrity of the signature file.
+ *
+ * @typedef {Object} VerifyMinisignFailureResult
+ * @property {false} ok Overall verification result.
+ * @property {boolean} isPubkeyFound Whether the public key was found.
+ * @property {boolean} isMessageValid The integrity of the data.
+ * @property {boolean} isCommentValid The integrity of the signature file.
+ *
+ * @typedef {VerifyMinisignSuccessResult | VerifyMinisignFailureResult} VerifyMinisignResult
  */
 
 const KEYNUMBYTES = 8;
@@ -221,10 +230,21 @@ export async function verifyMinisign(pubkeys, sigFile, dataFunc) {
     sigAndTrustedComment,
   );
 
-  return {
-    ok: isMessageValid && isCommentValid,
-    isPubkeyFound: true,
-    isMessageValid,
-    isCommentValid,
-  };
+  const ok = isMessageValid && isCommentValid;
+  if (ok) {
+    return {
+      ok,
+      trustedComment,
+      isPubkeyFound: true,
+      isMessageValid,
+      isCommentValid,
+    };
+  } else {
+    return {
+      ok,
+      isPubkeyFound: true,
+      isMessageValid,
+      isCommentValid,
+    };
+  }
 }

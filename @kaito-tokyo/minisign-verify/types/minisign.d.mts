@@ -102,11 +102,15 @@ export type SigFile = {
  * The key type for a Pubkey Map based on keynum.
  */
 export type KeynumKey = bigint;
-export type VerifyMinisignResult = {
+export type VerifyMinisignSuccessResult = {
     /**
      * Overall verification result.
      */
-    ok: boolean;
+    ok: true;
+    /**
+     * The verified trusted comment from the signature file.
+     */
+    trustedComment: string;
     /**
      * Whether the public key was found.
      */
@@ -120,3 +124,22 @@ export type VerifyMinisignResult = {
      */
     isCommentValid: boolean;
 };
+export type VerifyMinisignFailureResult = {
+    /**
+     * Overall verification result.
+     */
+    ok: false;
+    /**
+     * Whether the public key was found.
+     */
+    isPubkeyFound: boolean;
+    /**
+     * The integrity of the data.
+     */
+    isMessageValid: boolean;
+    /**
+     * The integrity of the signature file.
+     */
+    isCommentValid: boolean;
+};
+export type VerifyMinisignResult = VerifyMinisignSuccessResult | VerifyMinisignFailureResult;

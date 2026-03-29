@@ -4,9 +4,10 @@
 
 /**
  * @file @kaito-tokyo/minisign-verify/verify-js/index.mjs
- * Self-contained Minisign signature verification library for ES Modules.
- * @version 0.1.1
+ * Easy-to-use wrapper around the Minisign verifier for Node.js and compatible environments.
+ * @version 0.1.2
  * @since 2026-03-29
+ * @license Apache-2.0
  */
 
 import { arrayBuffer, text } from 'node:stream/consumers';
