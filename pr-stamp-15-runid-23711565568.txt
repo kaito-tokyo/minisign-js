@@ -1,0 +1,21 @@
+title:	Refactor validate-pr.md
+state:	MERGED
+author:	umireon (Kaito Udagawa)
+labels:	validate
+assignees:	
+reviewers:	Copilot (AI) (Commented)
+projects:	
+milestone:	
+number:	15
+url:	https://github.com/kaito-tokyo/minisign-js/pull/15
+additions:	39
+deletions:	45
+auto-merge:	disabled
+--
+## Pull Request Checklist
+
+Please read our latest [CONTRIBUTING.md](https://github.com/kaito-tokyo/minisign-js/blob/main/CONTRIBUTING.md).
+
+- [x] I have read the latest CONTRIBUTING.md.
+- [x] I have signed off and verified all my commits.
+
