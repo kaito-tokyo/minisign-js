@@ -1,0 +1,65 @@
+# SPDX-FileCopyrightText: 2026 Kaito Udagawa <umireon@kaito.tokyo>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Publish @kaito-tokyo/minisign-verify to npm registry
+
+# description: Dedicated workflow for publishing @kaito-tokyo/minisign-verify package to npm registry.
+# author: Kaito Udagawa <umireon@kaito.tokyo>
+# version: 1.0.0
+# date: 2026-03-29
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish-minisign-verify:
+    environment: production-minisign-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version-file: .node-version
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install npm dependencies
+        shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        run: npm ci
+
+      - name: Run lint
+        shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        run: npm --include-workspace-root --workspaces run lint
+
+      - name: Run tests
+        shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        run: npm --include-workspace-root --workspaces test
+
+      - name: Run types
+        shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        run: npm --include-workspace-root --workspaces run types
+
+      - name: Ensure working tree is clean
+        shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo 'ERROR: Working tree is not clean!'
+            git status
+            exit 1
+          fi
+
+      - name: Publish @kaito-tokyo/minisign-verify to npm registry
+        shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        run: npm publish --workspace @kaito-tokyo/minisign-verify --access public
