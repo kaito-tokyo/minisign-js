@@ -1,7 +1,18 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "outDir": "./types",
+    "rootDir": "./verify-js",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "esnext",
     "types": ["node"]
   },
-  "include": ["**/*.mjs"]
+  "include": ["verify-js/*.mjs"],
+  "exclude": ["types"]
 }

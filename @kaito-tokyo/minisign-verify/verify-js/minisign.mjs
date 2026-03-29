@@ -3,34 +3,35 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /**
- * @file @kaito-tokyo/minisign-verify
+ * @file @kaito-tokyo/minisign-verify/verify-js/index.mjs
  * Self-contained Minisign signature verification library for ES Modules.
- * @version 1.0.0
- * @since 2026-03-27
+ * @version 0.1.1
+ * @since 2026-03-29
  */
 
 /**
- * @typedef {Object} Pubkey Public key of minisign verification.
- * @property {string} key Opaque key for Map<string, Pubkey> that can be used with `verifyMinisign()`.
+ * @typedef {Object} Pubkey Public key of Minisign verification.
  * @property {CryptoKey} cryptoKey internal field
  * @property {'Ed'} sigAlg internal field
  * @property {Uint8Array<ArrayBuffer>} keynum internal field
  * @property {Uint8Array<ArrayBuffer>} pk internal field
  *
- * @typedef {Object} Sig Single signature data of minisign verification.
- * @property {string} key internal field
+ * @typedef {Object} Sig Single signature data of Minisign verification.
  * @property {'Ed' | 'ED'} sigAlg internal field
  * @property {Uint8Array<ArrayBuffer>} keynum internal field
  * @property {Uint8Array<ArrayBuffer>} sig internal field
  *
- * @typedef {Object} SigFile Signature file of minisign verification.
+ * @typedef {Object} SigFile Signature file of Minisign verification.
  * @property {string} comment internal field
  * @property {Sig} sig internal field
  * @property {string} trustedComment internal field
  * @property {Uint8Array<ArrayBuffer>} globalSig internal field
  *
+ * @typedef {bigint} KeynumKey The key type for a Pubkey Map based on keynum.
+ *
  * @typedef {Object} VerifyMinisignResult
- * @property {boolean} ok Verification result overall.
+ * @property {boolean} ok Overall verification result.
+ * @property {boolean} isPubkeyFound Whether the public key was found.
  * @property {boolean} isMessageValid The integrity of the data.
  * @property {boolean} isCommentValid The integrity of the signature file.
  */
@@ -45,65 +46,14 @@ const crypto_sign_PUBLICKEYBYTES = 32;
 const crypto_sign_BYTES = 64;
 
 /**
- * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} arrayBuffer
- */
-function arrayBufferToUint8Array(arrayBuffer) {
-  if (ArrayBuffer.isView(arrayBuffer)) {
-    return new Uint8Array(arrayBuffer.buffer, arrayBuffer.byteOffset, arrayBuffer.byteLength);
-  } else {
-    return new Uint8Array(arrayBuffer);
-  }
-}
-
-/**
- * @param {string} base64String
- * @return {Promise<Uint8Array<ArrayBuffer>>}
- */
-async function base64ToUint8Array(base64String) {
-  if ('fromBase64' in Uint8Array && typeof Uint8Array.fromBase64 === "function") {
-    return Uint8Array.fromBase64(base64String);
-  } else if (typeof Buffer !== "undefined") {
-    return Buffer.from(base64String, "base64");
-  } else if (typeof fetch === "function") {
-    const res = await fetch(
-      `data:application/octet-stream;base64,${base64String}`,
-    );
-    if (!res.ok) throw new Error("Base64DecodingError");
-    return new Uint8Array(await res.arrayBuffer());
-  } else {
-    throw new Error("Base64DecodingNotSupportedError");
-  }
-}
-
-/**
- * @param {ArrayBuffer | ArrayBufferView<ArrayBuffer>} arrayBuffer
- * @return {Promise<string>}
- */
-async function arrayBufferToBase64url(arrayBuffer) {
-  const uint8Array = arrayBufferToUint8Array(arrayBuffer);
-
-  if ('toBase64' in uint8Array && typeof uint8Array.toBase64 === "function") {
-    return uint8Array.toBase64({ alphabet: "base64url", omitPadding: true });
-  } else if (typeof Buffer !== "undefined") {
-    return Buffer.from(uint8Array).toString("base64url");
-  } else {
-    throw new Error("Base64EncodingNotSupportedError");
-  }
-}
-
-/**
- * Parses a minisign public key in the form of Base64-string.
+ * Asynchronously reads a Minisign public key in the form of Base64-string.
+ * @param {typeof import("./base64.mjs").arrayBufferToBase64url} $arrayBufferToBase64url
+ * @param {typeof import("./base64.mjs").base64ToUint8Array} $base64ToUint8Array
  * @param {string} pubkeyString The Base64-string of the public key.
- * @param {typeof base64ToUint8Array} [_base64ToUint8Array]
- * @param {typeof arrayBufferToBase64url} [_arrayBufferToBase64url]
  * @return {Promise<Pubkey>}
  */
-export async function parsePubkey(
-  pubkeyString,
-  _base64ToUint8Array = base64ToUint8Array,
-  _arrayBufferToBase64url = arrayBufferToBase64url,
-) {
-  const bytes = await _base64ToUint8Array(pubkeyString);
+export async function readPubkey($arrayBufferToBase64url, $base64ToUint8Array, pubkeyString) {
+  const bytes = $base64ToUint8Array(pubkeyString);
 
   if (bytes.length !== 2 + KEYNUMBYTES + crypto_sign_PUBLICKEYBYTES) {
     throw new Error("InvalidPubkeyLengthError");
@@ -122,7 +72,7 @@ export async function parsePubkey(
     {
       kty: "OKP",
       crv: "Ed25519",
-      x: await _arrayBufferToBase64url(pk),
+      x: await $arrayBufferToBase64url(pk),
     },
     { name: "Ed25519" },
     false,
@@ -130,7 +80,6 @@ export async function parsePubkey(
   );
 
   return {
-    key: JSON.stringify(Array.from(keynum)),
     cryptoKey,
     sigAlg: SIGALG,
     keynum,
@@ -139,16 +88,13 @@ export async function parsePubkey(
 }
 
 /**
- * Parses a minisign signature in the form of Base64-string.
+ * Parses a Minisign signature in the form of Base64-string.
+ * @param {typeof import("./base64.mjs").base64ToUint8Array} $base64ToUint8Array
  * @param {string} sigString The Base64-string of the signature.
- * @param {typeof base64ToUint8Array} [_base64ToUint8Array]
- * @return {Promise<Sig>}
+ * @return {Sig}
  */
-export async function parseSig(
-  sigString,
-  _base64ToUint8Array = base64ToUint8Array,
-) {
-  const bytes = await _base64ToUint8Array(sigString);
+export function parseSig($base64ToUint8Array, sigString) {
+  const bytes = $base64ToUint8Array(sigString);
 
   if (bytes.length !== 2 + KEYNUMBYTES + crypto_sign_BYTES) {
     throw new Error("InvalidSigLengthError");
@@ -172,21 +118,17 @@ export async function parseSig(
     throw new Error("InvalidSigAlgError");
   }
 
-  return { key: JSON.stringify(Array.from(keynum)), sigAlg, keynum, sig };
+  return { sigAlg, keynum, sig };
 }
 
 /**
  * Parses a `.minisig` file content.
+ * @param {typeof parseSig} $parseSig
+ * @param {typeof import("./base64.mjs").base64ToUint8Array} $base64ToUint8Array
  * @param {string} sigFileContent The content of the `.minisig` file as a string.
- * @param {typeof parseSig} [_parseSig]
- * @param {typeof base64ToUint8Array} [_base64ToUint8Array]
- * @return {Promise<SigFile>}
+ * @return {SigFile}
  */
-export async function parseSigFile(
-  sigFileContent,
-  _parseSig = parseSig,
-  _base64ToUint8Array = base64ToUint8Array,
-) {
+export function parseSigFile($parseSig, $base64ToUint8Array, sigFileContent) {
   const lines = sigFileContent.split(/\r?\n/);
 
   if (lines.length < 4) {
@@ -204,11 +146,11 @@ export async function parseSigFile(
   }
 
   const comment = commentLine.substring(COMMENT_PREFIX.length);
-  const sig = await _parseSig(sigString, _base64ToUint8Array);
+  const sig = $parseSig($base64ToUint8Array, sigString);
   const trustedComment = trustedCommentLine.substring(
     TRUSTED_COMMENT_PREFIX.length,
   );
-  const globalSig = await _base64ToUint8Array(globalSigString);
+  const globalSig = $base64ToUint8Array(globalSigString);
 
   if (globalSig.length !== crypto_sign_BYTES) {
     throw new Error("InvalidGlobalSigLengthError");
@@ -218,24 +160,41 @@ export async function parseSigFile(
 }
 
 /**
- * @param {Pubkey | Map<string, Pubkey>} pubkeys The minisign public key(s) from `parsePubkey()`.
- *   Provide a Pubkey, or construct a map with `new Map(pubkeys.map(pk => [pk.key, pk]))`.
+ * Gets the key for Map<PubkeyMapKey, Pubkey> from a Pubkey.
+ * @param {Pubkey | Sig} pubkey
+ * @return {KeynumKey}
+ */
+export function getKeynumKey(pubkey) {
+  const { keynum } = pubkey;
+  return new DataView(keynum.buffer, keynum.byteOffset, keynum.byteLength).getBigUint64(0, true);
+}
+
+/**
+ * @param {Pubkey | Map<KeynumKey, Pubkey>} pubkeys The Minisign public key(s) from `readPubkey()`.
+ *   Provide a Pubkey, or construct a map with `new Map(pubkeys.map(pk => [getKeynumKey(pk), pk]))`.
  * @param {SigFile} sigFile The `.minisig` content from `parseSigFile()`.
- * @param {(blake2b512Required: boolean) => Promise<ArrayBuffer | ArrayBufferView<ArrayBuffer>>} dataFunc Function to get the data to verify.
+ * @param {(blake2b512Required: boolean) => Promise<ArrayBuffer | ArrayBufferView<ArrayBuffer>>} dataFunc
+ *   Callback to get the data to verify. Called exactly once if no exception is thrown, and never called more than once.
  *   If `blake2b512Required` is `true`: Return BLAKE2b-512 hash of the data to verify.
  *   If `blake2b512Required` is `false`: Return the raw data.
  * @return {Promise<VerifyMinisignResult>} The result of the verification.
  *   Use its `ok` property to check if verification was successful.
  */
 export async function verifyMinisign(pubkeys, sigFile, dataFunc) {
-  const pubkey = pubkeys instanceof Map ? pubkeys.get(sigFile.sig.key) : pubkeys;
-  if (!pubkey) throw new Error("PubkeyNotFoundError");
+  const sigKeynumKey = getKeynumKey(sigFile.sig);
+  const pubkey = pubkeys instanceof Map ? pubkeys.get(sigKeynumKey) : pubkeys;
+
+  if (!pubkey || getKeynumKey(pubkey) !== sigKeynumKey) {
+    return {
+      ok: false,
+      isPubkeyFound: false,
+      isMessageValid: false,
+      isCommentValid: false,
+    };
+  }
+
   const { cryptoKey } = pubkey;
-  const {
-    sig: { sigAlg, sig },
-    trustedComment,
-    globalSig,
-  } = sigFile;
+  const { sig: { sigAlg, sig }, trustedComment, globalSig } = sigFile;
 
   if (sigAlg !== SIGALG_HASHED && sigAlg !== SIGALG) {
     throw new Error("UnsupportedSigAlgError");
@@ -264,6 +223,7 @@ export async function verifyMinisign(pubkeys, sigFile, dataFunc) {
 
   return {
     ok: isMessageValid && isCommentValid,
+    isPubkeyFound: true,
     isMessageValid,
     isCommentValid,
   };

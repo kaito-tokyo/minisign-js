@@ -1,6 +1,6 @@
 {
   "name": "@kaito-tokyo/minisign-verify",
-  "version": "1.0.0",
+  "version": "0.1.1",
   "description": "Self-contained Minisign signature verification library for ES Modules",
   "keywords": [],
   "homepage": "https://github.com/kaito-tokyo/minisign-js",
@@ -14,26 +14,37 @@
   "license": "Apache-2.0",
   "author": "Kaito Udagawa <umireon@kaito.tokyo> (https://github.com/umireon)",
   "type": "module",
-  "main": "./index.mjs",
-  "types": "./index.d.mts",
+  "main": "./verify-js/index.mjs",
+  "types": "./types/index.d.mts",
   "exports": {
     ".": {
-      "import": "./index.mjs",
-      "types": "./index.d.mts"
+      "import": "./verify-js/index.mjs",
+      "types": "./types/index.d.mts"
+    },
+    "./verify-js/index.mjs": {
+      "import": "./verify-js/index.mjs",
+      "types": "./types/index.d.mts"
+    },
+    "./verify-js/base64.mjs": {
+      "import": "./verify-js/base64.mjs",
+      "types": "./types/base64.d.mts"
+    },
+    "./verify-js/minisign.mjs": {
+      "import": "./verify-js/minisign.mjs",
+      "types": "./types/minisign.d.mts"
     }
   },
   "files": [
-    "index.mjs",
-    "index.d.mts",
-    "index.d.mts.license"
+    "verify-js/*.mjs",
+    "types/*.d.mts",
+    "types/*.d.mts.license"
   ],
   "engines": {
     "node": ">=24.0.0"
   },
   "scripts": {
-    "check": "tsc --noEmit",
     "test": "node --test",
-    "types": "tsc index.mjs --declaration --allowJs --emitDeclarationOnly --ignoreConfig"
+    "types": "tsc"
   },
   "devDependencies": {
     "@types/node": "^24.12.0",
