@@ -1,0 +1,44 @@
+# SPDX-FileCopyrightText: 2026 Kaito Udagawa <umireon@kaito.tokyo>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: Audit PR
+
+# description: Audit the merged Pull Request by putting audit trail on the audit branch.
+# author: Kaito Udagawa <umireon@kaito.tokyo>
+# version: 1.0.0
+# date: 2026-03-29
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  add-pr-stamp-to-audit-branch:
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+
+    if: github.event.pull_request.merged == true
+
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - shell: bash --noprofile --norc -euo pipefail -O nullglob {0}
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          PR_STAMP_CONTENT_B64="$(gh pr view "$PULL_REQUEST_NUMBER" | base64 -w 0)"
+          GH_REPO_CONTENT_CREATE_ARGS=(
+            --method PUT
+            -H "Accept: application/vnd.github+json"
+            -H "X-GitHub-Api-Version: 2026-03-10"
+            "/repos/$GITHUB_REPOSITORY/contents/pr-stamp-${PULL_REQUEST_NUMBER}-runid-${GITHUB_RUN_ID}.txt"
+            -f "message=audit-pr: Pull Request #${PULL_REQUEST_NUMBER} (run-id ${GITHUB_RUN_ID})"
+            -f "content=${PR_STAMP_CONTENT_B64}"
+            -f "branch=audit/pr-stamp"
+          )
+          gh api "${GH_REPO_CONTENT_CREATE_ARGS[@]}"
