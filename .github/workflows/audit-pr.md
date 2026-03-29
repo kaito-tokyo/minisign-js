@@ -5,7 +5,7 @@
 
 strict: true
 
-description: Audit the merged Pull Request by putting audit trail on the audit branch.
+description: Audit the merged Pull Request by putting audit trail on the audit branch. COPILOT_GITHUB_TOKEN needs to be configured.
 
 metadata:
   author: Kaito Udagawa
@@ -33,6 +33,7 @@ if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged
 
 permissions:
   contents: read
+  pull-requests: read
 
 steps:
   - name: Extract the Pull Request stamp
@@ -42,6 +43,7 @@ steps:
       PR_NUMBER: ${{ inputs.pr-number || github.event.pull_request.number }}
     run: |
       if ! [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+        echo "ERROR: Invalid input of pr-number!"
         exit 1
       fi
 
