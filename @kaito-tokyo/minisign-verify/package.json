@@ -43,6 +43,7 @@
     "node": ">=24.0.0"
   },
   "scripts": {
+    "lint": "",
     "test": "node --test",
     "types": "tsc"
   },

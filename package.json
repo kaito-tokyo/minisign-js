@@ -2,7 +2,9 @@
   "name": "@kaito-tokyo/minisign-js",
   "scripts": {
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "test": "",
+    "types": ""
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
