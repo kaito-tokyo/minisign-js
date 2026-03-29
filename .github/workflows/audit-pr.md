@@ -47,7 +47,7 @@ steps:
         exit 1
       fi
 
-      gh pr view "$PR_NUMBER" > "/tmp/pr-stamp-${PR_NUMBER}-runid-${GITHUB_RUN_ID}.txt"
+      gh pr view "$PR_NUMBER" > "/tmp/pr-stamp.txt"
 
 safe-outputs:
   messages:
@@ -65,4 +65,12 @@ safe-outputs:
   staged: false
 ---
 
-Call `upload_asset` tool with the path `/tmp/pr-stamp-${{ inputs.pr-number || github.event.pull_request.number }}-runid-${{ github.run_id }}.txt`.
+# Uploading a Pull Request stamp for Auditing
+
+## Rules
+
+You MUST not modify `/tmp/pr-stamp.txt` after the `Extract the Pull Request stamp` custom step on this workflow.
+
+## Instructions
+
+Call `upload_asset` tool with the path `/tmp/pr-stamp.txt`.
