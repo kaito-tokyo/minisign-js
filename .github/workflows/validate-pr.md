@@ -3,23 +3,32 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
+strict: true
+
 description: Validate if this Pull Request meets our project criteria. COPILOT_GITHUB_TOKEN needs to be configured.
+
+metadata:
+  author: Kaito Udagawa
+  version: 1.1.1
+  date: 2026-03-29
+
+engine:
+  id: copilot
+  model: gpt-5-mini
 
 on:
   label_command:
     name: validate
     events: [pull_request]
-  status-comment: false
 
-metadata:
-  author: Kaito Udagawa
-  version: "1.1.0"
+  status-comment: false
+  reaction: none
+
+if: startsWith(github.ref, 'refs/pull/') && github.event.label.name == 'validate'
 
 permissions:
   contents: read
   pull-requests: read
-
-if: startsWith(github.ref, 'refs/pull/') && github.event.label.name == 'validate'
 
 steps:
   - name: Fetch Pull Request commits
@@ -66,13 +75,10 @@ steps:
       } >/tmp/gh-aw/agent/pr_checklist.md
 
 safe-outputs:
-  activation-comments: false
-  report-failure-as-issue: false
+  add-comment:
 
   messages:
     append-only-comments: true
-
-  add-comment:
 
   jobs:
     accept_validate_pr:
@@ -146,9 +152,12 @@ safe-outputs:
 
             exit "$rejected"
 
-engine:
-  id: copilot
-  model: gpt-5-mini
+  activation-comments: false
+  mentions:
+    allow-team-members: false
+    allow-context: false
+  report-failure-as-issue: false
+  staged: false
 ---
 
 # Validate Pull Request
