@@ -22,6 +22,7 @@ filter='
   main,
   types,
   exports,
+  bin,
   files,
   engines,
   scripts,
