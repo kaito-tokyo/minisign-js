@@ -1,5 +1,6 @@
 {
   "name": "@kaito-tokyo/minisign-js",
+  "version": "0.1.2",
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
