@@ -7,7 +7,7 @@
 /**
  * @file @kaito-tokyo/minisign-verify/verify-js/minisign-verify-cli.mjs
  * A command-line interface for Minisign verification for Node.js.
- * @version 0.1.2
+ * @version 0.1.3
  * @since 2026-03-29
  */
 

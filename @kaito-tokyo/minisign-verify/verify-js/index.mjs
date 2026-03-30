@@ -5,7 +5,7 @@
 /**
  * @file @kaito-tokyo/minisign-verify/verify-js/index.mjs
  * Easy-to-use wrapper around the Minisign verifier for Node.js and compatible environments.
- * @version 0.1.2
+ * @version 0.1.3
  * @since 2026-03-29
  * @license Apache-2.0
  */

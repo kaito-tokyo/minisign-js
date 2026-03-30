@@ -1,7 +1,7 @@
 /**
  * @file @kaito-tokyo/minisign-verify/verify-js/base64.mjs
  * Base64 utilities for Modern JavaScript environments.
- * @version 0.1.2
+ * @version 0.1.3
  * @since 2026-03-29
  */
 /**
