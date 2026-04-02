@@ -1,0 +1,21 @@
+title:	Add getopt for compatibility
+state:	MERGED
+author:	umireon (Kaito Udagawa)
+labels:	validate
+assignees:	
+reviewers:	Copilot (AI) (Commented)
+projects:	
+milestone:	
+number:	18
+url:	https://github.com/kaito-tokyo/minisign-js/pull/18
+additions:	289
+deletions:	29
+auto-merge:	disabled
+--
+## Pull Request Checklist
+
+Please read our latest [CONTRIBUTING.md](https://github.com/kaito-tokyo/minisign-js/blob/main/CONTRIBUTING.md).
+
+- [x] I have read the latest CONTRIBUTING.md.
+- [x] I have signed off and verified all my commits.
+
