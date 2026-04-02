@@ -29,6 +29,10 @@
       "import": "./verify-js/base64.mjs",
       "types": "./types/base64.d.mts"
     },
+    "./verify-js/getopt.mjs": {
+      "import": "./verify-js/getopt.mjs",
+      "types": "./types/getopt.d.mts"
+    },
     "./verify-js/minisign.mjs": {
       "import": "./verify-js/minisign.mjs",
       "types": "./types/minisign.d.mts"
