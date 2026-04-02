@@ -1,9 +1,10 @@
 /**
  * @param {string[]} argv
  * @param {string} optstring
+ * @param {number} [optind=1]
  * @return {Generator<{opt: OptChar | undefined, optind: number, optarg: string | undefined}, void, unknown>}
  */
-export function getopt(argv: string[], optstring: string): Generator<{
+export function getopt(argv: string[], optstring: string, optind?: number): Generator<{
     opt: OptChar | undefined;
     optind: number;
     optarg: string | undefined;

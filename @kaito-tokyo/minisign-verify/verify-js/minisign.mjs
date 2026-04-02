@@ -5,8 +5,8 @@
 /**
  * @file @kaito-tokyo/minisign-verify/verify-js/minisign.mjs
  * Self-contained Minisign signature verification library for ES Modules.
- * @version 0.1.3
- * @since 2026-03-29
+ * @version 0.1.4
+ * @since 2026-04-03
  */
 
 /**
