@@ -126,7 +126,7 @@ export class MinisignVerifier {
    * @param {string} [signatureFilepath] The file path to the `.minisig` file. Defaults to `${filepath}.minisig`.
    */
   async verifyFilepath(filepath, signatureFilepath = undefined) {
-    const sigFileContent = await readFile(signatureFilepath ?? `${filepath}.minisig`, "utf-8");
+    const sigFileContent = await readFile(signatureFilepath ?? `${filepath}.minisig`, "utf8");
     return this.verify(createReadStream(filepath), sigFileContent);
   }
 }
