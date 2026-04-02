@@ -7,8 +7,8 @@
 /**
  * @file @kaito-tokyo/minisign-verify/verify-js/minisign-verify-cli.mjs
  * A command-line interface for Minisign verification for Node.js.
- * @version 0.1.3
- * @since 2026-03-29
+ * @version 0.1.4
+ * @since 2026-04-03
  */
 
 import { createReadStream } from "node:fs";
@@ -19,7 +19,7 @@ import { getopt } from "./getopt.mjs";
 import { MinisignVerifier } from "./index.mjs";
 
 // This directory is intended to be self-contained and cannot assume the presence of package.json.
-const VERSION = "0.1.3";
+const VERSION = "0.1.4";
 
 const usage = `Usage:
 minisign-verify -V [-H] [-x sig_file] [-p pubkey_file | -P pubkey] [-o] [-q] -m file

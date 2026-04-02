@@ -1,6 +1,6 @@
 {
   "name": "@kaito-tokyo/minisign-verify",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Self-contained Minisign signature verification library for ES Modules",
   "keywords": [],
   "homepage": "https://github.com/kaito-tokyo/minisign-js",
