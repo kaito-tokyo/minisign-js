@@ -10,7 +10,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@eslint/json": "^1.2.0",
-    "eslint": "^10.1.0",
+    "eslint": "^10.4.0",
     "globals": "^17.4.0"
   },
   "private": true,
